@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04060b">
+<title>Optimex IA | Dev: lasquer47</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@600;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060b;--amb:#ffb000;--amb2:#ff7a00;--tl:#46e0d8;--ok:#3ddc97;--tx:#e8ecf2;--mut:#778096;--line:rgba(255,255,255,.09);--pn:rgba(6,10,17,.88);color-scheme:dark}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{min-height:100dvh;background:var(--bg);color:var(--tx);font:400 15px/1.5 Inter,sans-serif;overflow-x:hidden}
+svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#orb{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+#app{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:0 14px calc(22px + env(safe-area-inset-bottom))}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 2px 4px}
+.brand{display:flex;align-items:center;gap:11px}
+.logo{width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(70,224,216,.6);display:grid;place-items:center;box-shadow:0 0 14px rgba(70,224,216,.25)}
+.logo::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--amb);box-shadow:0 0 10px var(--amb)}
+.brand b{position:relative;display:block;font:900 14px Orbitron;letter-spacing:4px;color:#fff}
+.brand b::before,.brand b::after{content:attr(data-t);position:absolute;left:0;top:0;opacity:0}
+.brand b::before{color:#0ff;animation:gl 7s infinite}.brand b::after{color:#f0a;animation:gl 7s infinite .1s}
+@keyframes gl{0%,93%,100%{opacity:0;transform:none}94%{opacity:.85;transform:translate(-2px,1px)}96%{opacity:.85;transform:translate(2px,-1px)}98%{opacity:0}}
+.brand small{display:block;font:9px 'Share Tech Mono';color:var(--mut);letter-spacing:1.5px;margin-top:1px}
+.ib{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(6,10,17,.6);color:var(--tx);cursor:pointer;margin-left:6px;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.ib:active{background:rgba(70,224,216,.15);color:var(--tl)}
+
+.hero{padding-top:clamp(228px,38dvh,400px);text-align:center}
+.kick{font:9px 'Share Tech Mono';letter-spacing:5px;color:var(--amb);text-shadow:0 0 12px rgba(255,176,0,.4)}
+.hero h1{font:900 clamp(22px,7vw,32px)/1.18 Orbitron;color:#fff;margin:10px 0 8px;letter-spacing:.5px;text-shadow:0 2px 24px rgba(0,0,0,.9)}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--amb),var(--tl));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font:400 14px/1.5 Inter;color:#9aa4b8;max-width:380px;margin:0 auto;text-shadow:0 1px 14px #000}
+
+.inp{margin-top:18px;padding:14px 14px 12px;border:1px solid var(--line);border-radius:22px;background:var(--pn);transition:border-color .3s,box-shadow .3s}
+.inp:focus-within{border-color:rgba(70,224,216,.55);box-shadow:0 0 28px rgba(70,224,216,.13)}
+.tel{display:flex;flex-wrap:wrap;gap:4px 14px;font:8.5px 'Share Tech Mono';letter-spacing:2px;color:var(--mut);margin-bottom:8px}
+.tel b{font-weight:400;color:var(--tl)}
+.tel i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);margin-right:6px;animation:bl 1.6s infinite}
+body[data-mode=think] .tel i{background:var(--amb);box-shadow:0 0 8px var(--amb)}
+@keyframes bl{50%{opacity:.25}}
+textarea{width:100%;min-height:74px;max-height:180px;resize:none;background:none;border:0;outline:0;color:var(--tx);font:400 16px/1.5 Inter;padding:4px 2px}
+textarea::placeholder{color:#5f687d}
+.exs{display:flex;gap:6px;overflow-x:auto;padding:6px 0 10px;scrollbar-width:none}
+.exs button{flex:none;max-width:78vw;padding:6px 11px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#b4bccd;font:11px/1.3 'Share Tech Mono';cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exs button:active{border-color:rgba(70,224,216,.6);color:var(--tl)}
+.go{position:relative;overflow:hidden;width:100%;height:48px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--amb),var(--amb2));color:#140a00;font:800 12px Orbitron;letter-spacing:3px;cursor:pointer;box-shadow:0 6px 24px rgba(255,122,0,.28)}
+.go::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:sh 3.4s infinite}
+@keyframes sh{0%,55%{left:-60%}100%{left:130%}}
+.go:disabled{opacity:.55;cursor:default}.go:disabled::after{display:none}
+
+#out{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+#out>*{scroll-margin-top:12px}
+.card{border:1px solid rgba(70,224,216,.25);border-radius:18px;background:var(--pn);padding:14px 16px;font:11px/1.7 'Share Tech Mono';color:var(--mut);animation:in .45s both}
+@keyframes in{from{opacity:0;transform:translateY(12px)}}
+.card .ct{color:var(--tl);letter-spacing:3px;font-size:10px;margin-bottom:6px}
+.card .kv{display:grid;grid-template-columns:auto 1fr;gap:1px 14px}.card .kv b{color:var(--tx);font-weight:400;text-align:right}
+.card .pg{height:2px;background:rgba(255,255,255,.08);margin-top:9px;overflow:hidden}.card .pg i{display:block;height:100%;width:30%;background:var(--tl);animation:sl 1.1s linear infinite}
+@keyframes sl{from{margin-left:-30%}to{margin-left:100%}}
+.bk{animation:bl .8s infinite}
+.tag{display:inline-block;padding:0 7px;border-radius:8px;border:1px solid;font-size:8.5px;letter-spacing:1px;margin-left:8px}
+.tag.ok{color:var(--ok);border-color:rgba(61,220,151,.5)}.tag.es{color:var(--amb);border-color:rgba(255,176,0,.5)}
+.card.err{border-color:rgba(255,84,112,.5)}.card.err .ct{color:#ff5470}
+.card.err .er{font:500 14px/1.5 Inter;color:#ffb7c2}
+.rwb{display:flex;gap:8px;margin-top:10px}.rwb button{background:none;border:1px solid #ff5470;color:#ff9fae;padding:6px 12px;border-radius:10px;font:500 12px Inter;cursor:pointer}.rwb button+button{border-color:var(--line);color:var(--mut)}
+.card.err .dt{display:none;margin-top:10px;font:10.5px/1.55 'Share Tech Mono';color:var(--mut);word-break:break-word}.card.err.open .dt{display:block}
+.card.q{border-color:rgba(255,176,0,.45)}.card.q .ct{color:var(--amb)}.card.q div+div{font:500 16px/1.45 Inter;color:#fff}
+.card.nt2{border-color:rgba(255,176,0,.3)}.card.nt2 .ct{color:var(--amb)}.card.nt2 div+div{font:500 14px/1.5 Inter;color:var(--tx)}
+
+.pf{border-color:rgba(255,176,0,.3)}.pf .ct{color:var(--amb)}
+.pf .ph{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;color:#fff;font:600 16px Inter;padding:10px 12px;outline:0}
+.pf .ph:focus{border-color:rgba(70,224,216,.6)}
+.pf .nt{font:400 13px/1.45 Inter;color:#9aa4b8;margin:8px 2px 2px}
+.pf .rw{margin-top:12px}.pf .lb{font:9px 'Share Tech Mono';letter-spacing:2px;color:var(--mut);margin-bottom:6px}
+.au{display:inline-block;margin-left:8px;padding:0 6px;border:1px dashed rgba(70,224,216,.5);border-radius:6px;color:var(--tl);font-size:8px}.au[hidden]{display:none}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{padding:8px 13px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--tx);font:500 13px Inter;cursor:pointer;transition:background .2s,border-color .2s}
+.opt.on{border-color:rgba(255,176,0,.65);background:rgba(255,176,0,.13);color:var(--amb)}
+.pf .dv .card{margin-top:12px;background:rgba(70,224,216,.04)}
+.gen{width:100%;margin-top:16px;height:46px;border-radius:14px;border:1px solid rgba(255,176,0,.6);background:rgba(255,176,0,.1);color:var(--amb);font:800 11px Orbitron;letter-spacing:3px;cursor:pointer}
+.gen:active{background:var(--amb);color:#000}.gen:disabled{opacity:.6}
+
+.hud{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015)),rgba(6,10,17,.92);border:1px solid var(--line);border-radius:20px;overflow:hidden;animation:in .5s both}
+.hud::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,var(--amb),var(--tl),transparent)}
+.hh{padding:16px 18px 12px;border-bottom:1px solid var(--line);position:relative}
+.k{font:9px 'Share Tech Mono';letter-spacing:5px;color:var(--mut)}
+.hud h2{font:900 24px Orbitron;color:var(--amb);text-shadow:0 0 16px rgba(255,176,0,.35);text-transform:uppercase;word-break:break-word;margin:3px 0;padding-right:70px}
+.sub{font:500 13px Inter;color:var(--mut)}
+.cf{position:absolute;right:16px;top:16px;text-align:right;font:9px 'Share Tech Mono';letter-spacing:2px;color:var(--ok)}
+.cf b{display:block;font:800 18px Orbitron;letter-spacing:0}
+.row{padding:11px 18px 10px;border-bottom:1px solid var(--line);animation:slide .5s both;animation-delay:var(--d)}
+@keyframes slide{from{opacity:0;transform:translateX(-12px)}}
+.row div{display:flex;justify-content:space-between;align-items:baseline;font:500 15px Inter}
+.row b{font:800 16px Orbitron;color:#fff}
+.row.big div{font-size:17px}.row.big b{font-size:22px;color:var(--amb)}
+.dl{font:9.5px 'Share Tech Mono';margin-left:8px;letter-spacing:0}.dl.p{color:var(--ok)}.dl.n{color:#ff6b86}
+.bar{height:3px;border-radius:3px;background:rgba(255,255,255,.07);margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--amb2),var(--amb));box-shadow:0 0 10px rgba(255,176,0,.6);transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.sys{padding:14px 18px 4px}
+.sys h3{font:800 11px Orbitron;letter-spacing:3px;color:var(--amb);margin-bottom:10px}
+.st{margin-bottom:10px}
+.st span{display:block;font:9px 'Share Tech Mono';letter-spacing:2px;color:var(--mut);text-transform:uppercase}
+.st b{display:block;font:600 16px Inter;color:#fff}
+details{padding:0 18px 4px;font:12px 'Share Tech Mono';color:var(--mut)}
+summary{cursor:pointer;color:var(--tl);padding:4px 0;letter-spacing:1px}
+details p{line-height:1.7;padding:4px 0}
+.acts{display:flex;gap:10px;padding:12px 18px 18px}
+.acts button{flex:1;background:rgba(255,176,0,.07);color:var(--amb);border:1px solid rgba(255,176,0,.5);border-radius:12px;padding:12px 6px;font:800 11px Orbitron;letter-spacing:1px;cursor:pointer}
+.acts button:active{background:var(--amb);color:#000}
+
+footer{text-align:center;font:9px 'Share Tech Mono';color:#464d60;padding:26px 0 0;letter-spacing:2px}
+#toast{position:fixed;top:calc(58px + env(safe-area-inset-top));left:14px;right:14px;z-index:8;max-width:532px;margin:0 auto;padding:10px 14px;border-radius:12px;background:rgba(30,10,16,.97);border:1px solid rgba(255,84,112,.6);color:#ffb7c2;font:500 13px/1.4 Inter;opacity:0;transform:translateY(-8px);transition:.3s;pointer-events:none}
+#toast.on{opacity:1;transform:none}
+.modal{position:fixed;inset:0;background:rgba(2,4,8,.92);display:none;align-items:center;justify-content:center;z-index:9;padding:16px}
+.modal.on{display:flex}
+.modal .hud{width:100%;max-width:430px;max-height:85dvh;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
+.modal h2{font-size:18px;padding:0}
+.modal input,.modal select{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--tx);padding:12px;font:500 15px Inter;border-radius:12px;width:100%}
+.n{font:11px/1.5 'Share Tech Mono';color:var(--mut)}
+.mod-acts{display:flex;gap:8px}
+.mod-acts button,.hi{flex:1;background:rgba(255,176,0,.07);color:var(--amb);border:1px solid rgba(255,176,0,.5);border-radius:12px;padding:11px 6px;font:800 11px Orbitron;cursor:pointer}
+.hi{text-align:left;font:500 15px Inter;color:var(--tx);border-color:var(--line);flex:none}
+.hi small{display:block;font:10px 'Share Tech Mono';color:var(--mut)}
+.boot{position:fixed;inset:0;background:#000;z-index:20;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:18px;padding:0 9vw;color:var(--ok);font:12px 'Share Tech Mono';transition:opacity .7s}
+.boot pre{line-height:1.9;white-space:pre-wrap}.boot pre u{text-decoration:none;color:#fff}
+.pb{width:100%;max-width:300px;height:2px;background:#16202a}.pb i{display:block;height:100%;width:0;background:var(--ok);box-shadow:0 0 10px var(--ok);transition:width .3s}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body data-mode="idle">
+<div class="boot" id="boot"><pre id="bt"></pre><div class="pb"><i id="pbi"></i></div></div>
+<canvas id="orb"></canvas>
+<div id="toast"></div>
+<div id="app">
+  <header>
+    <div class="brand"><div class="logo"></div><div><b data-t="OPTIMEX IA">OPTIMEX IA</b><small>Dev: lasquer47 · ∞ PREMIUM</small></div></div>
+    <div><button class="ib" id="hb" title="Historial"></button><button class="ib" id="cb" title="Configuración"></button></div>
+  </header>
+  <section class="hero">
+    <div class="kick">CALIBRADOR NEURONAL · FREE FIRE</div>
+    <h1>Tu sensi,<br><em>calibrada al milímetro.</em></h1>
+    <p>Describe tu celular y cómo juegas. La IA analiza tu hardware y calcula el resto.</p>
+  </section>
+  <form class="inp" id="f">
+    <div class="tel"><span><i></i><b id="st">EN LÍNEA</b></span><span>LAT <b id="tLat">--</b></span><span>MODELO <b id="tMod">--</b></span><span>CALIBRACIONES <b id="tCnt">0</b></span></div>
+    <textarea id="in" rows="3" autocomplete="off" spellcheck="false"></textarea>
+    <div class="exs" id="exs"></div>
+    <button class="go" id="gob" type="submit">◉ ANALIZAR</button>
+  </form>
+  <main id="out"></main>
+  <footer>OPTIMEX IA | DEV: LASQUER47</footer>
+</div>
+
+<div class="modal" id="cfg"><div class="hud">
+  <h2>NÚCLEO IA</h2>
+  <select id="prov"><option value="anthropic">Anthropic (Claude)</option><option value="openai">OpenAI</option><option value="gemini">Google Gemini</option></select>
+  <input id="model" placeholder="Modelo">
+  <input id="key" type="password" placeholder="Pega tu API key aquí">
+  <div class="n">La clave se guarda solo en este navegador, nunca en GitHub.</div>
+  <div class="mod-acts"><button id="save">GUARDAR</button><button id="close">CERRAR</button></div>
+</div></div>
+<div class="modal" id="his"><div class="hud">
+  <h2>HISTORIAL DE SENSIS</h2><div id="hl" style="display:flex;flex-direction:column;gap:8px"></div>
+  <div class="mod-acts"><button id="hclear">BORRAR TODO</button><button id="hclose">CERRAR</button></div>
+</div></div>
+
+<script>
+/* ===== GLOBALES ===== */
+const PROXY='https://optimex-ia.lasquer47.workers.dev'; // URL de tu Worker de Cloudflare. Vacío = modo desarrollador con API key.
+const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms)),cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+const DEF={anthropic:'claude-sonnet-4-6',openai:'gpt-4o-mini',gemini:'gemini-2.0-flash'};
+let cfg={p:'gemini',m:DEF.gemini,k:''};
+try{Object.assign(cfg,JSON.parse(localStorage.getItem('optimex')||'{}'))}catch(e){}
+if(PROXY){cfg.p='gemini';cfg.k=''}
+const P=()=>PROXY?'gemini':cfg.p,HK=()=>!!(PROXY||cfg.k);
+let busy=false,mode='idle',tt,LAT=0,curModel='',DEV=null,devName='',scanP=null,LASTCAL=null,CTX=[],PROF=null,AWAIT=false,ASKED=false;
+const LG=()=>$('#out');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),5000)}
+function histN(){try{return JSON.parse(localStorage.getItem('optimex_h')||'[]').length}catch(e){return 0}}
+function tele(){const g=(i,v)=>{const e=$('#'+i);if(e)e.textContent=v};g('tLat',LAT?LAT+' ms':'--');g('tMod',(curModel||'--').replace('gemini-',''));g('tCnt',String(histN()))}
+function down(){const l=$('#out').lastElementChild;if(l)l.scrollIntoView({behavior:'smooth',block:'nearest'})}
+const dl=d=>d?`<span class="dl ${d>0?'p':'n'}">${d>0?'+':''}${d}</span>`:'';
+
+const PARSE_SYS=`Eres el analizador de perfiles de Optimex IA, un generador de sensibilidades de Free Fire. Recibes la descripción libre del jugador (puede venir en varias partes). Extrae SOLO un JSON, sin texto extra:
+{"celular":"marca y modelo, o vacío","apodo":"si dijo cómo llamarlo, o vacío","estilo":"corta|media|larga|vacío","dedos":2,"base":"baja|media|alta|vacío","problema":"ninguno|pasa_cabeza|pegada_pecho|mucha_sensi|lenta|pesada|inestable|vacío","hz":0,"notas":"una frase corta, en español, con lo que entendiste del jugador","pregunta":"UNA sola pregunta corta, solo si falta el celular; si no, vacío"}
+Reglas: interpreta jerga (garra/claw = 3 o 4 dedos, "se me va de largo" = pasa_cabeza, "se queda en el pecho" = pegada_pecho, "muy sensible" = mucha_sensi, "va lenta" = lenta). "dedos" es 0 si no lo dijo. "hz" solo si lo mencionó, si no 0. Lo que no esté lo dejas vacío o 0: el sistema asume valores razonables. Solo preguntas por el celular y solo si no lo dio; nunca preguntes otra cosa.`;
+const ADJ_SYS=`Eres el afinador de sensibilidades de Free Fire de Optimex IA. Recibes la petición del jugador y los valores actuales (escala 0-200). Convierte la petición en puntos de ajuste. Responde SOLO un JSON, sin texto extra:
+{"ajustes":{"general":0,"punto_rojo":0,"mira2x":0,"mira4x":0,"mira_awm":0,"camara_libre":0},"mensaje":"frase corta que explique qué cambiaste"}
+Los puntos van de -15 a +15 (ej. "sube un poco la 4x" => mira4x:4; "todo muy rápido" => baja todo entre -5 y -8; "se me pasa la cabeza" => punto_rojo:-8, mira2x:-6; "va lenta" => sube todo entre 5 y 8). Si la petición no es un ajuste, deja todo en 0 y en "mensaje" explica brevemente qué puede pedir.`;
+
+
+const CAL_SYS=`Eres el motor experto de calibración de sensibilidades de Free Fire de Optimex IA. Recibes un JSON con el perfil del jugador y las especificaciones del celular (verificadas o estimadas). Calcula la sensibilidad óptima en la escala completa 0-200, sin límites artificiales ni valores "seguros": usa todo el rango si el hardware y el perfil lo justifican.
+Referencia real (Android gama media, Head Shot, 2 dedos): General 191, Punto rojo 183, Mira 2x 158, Mira 4x 142, Mira AWM 112, Cámara libre 149. Proporciones típicas respecto al General: punto rojo 0.93-0.98, 2x 0.78-0.88, 4x 0.68-0.80, AWM 0.52-0.65, cámara libre 0.72-0.85; ajústalas al caso.
+Factores: refresco 120/144 Hz y muestreo táctil alto (>=240 Hz) permiten más sensibilidad con precisión; 60 Hz o muestreo bajo necesitan compensar con algo más de General pero menos en miras para evitar sobreimpulso; 2 dedos requiere más sensibilidad que 3-4 dedos (claw); estilo corta distancia sube General y punto rojo, larga distancia baja 4x/AWM; la sensibilidad base (baja/media/alta) fija el nivel de partida. Problemas: pasa_cabeza = baja punto rojo y 2x un 8-14%; mucha_sensi = baja todo; lenta/pesada = sube; pegada_pecho = la mira cae al pecho: baja ligeramente punto rojo y 2x y mantén General; inestable = baja un poco las miras.
+Responde SOLO un JSON, sin texto extra: {"general":n,"punto_rojo":n,"mira2x":n,"mira4x":n,"mira_awm":n,"camara_libre":n,"dpi_recomendado":"texto corto","boton_pct":n,"razon":["máx 4 frases cortas que expliquen las decisiones clave"]}. Valores n enteros 0-200 con general >= punto_rojo >= mira2x >= mira4x >= mira_awm; boton_pct entre 35 y 80 (tamaño del botón de disparo).`;
+
+/* ===== MOTOR LOCAL (respaldo y validación) ===== */
+const K=['general','punto_rojo','mira2x','mira4x','mira_awm','camara_libre'];
+const RAT=[.958,.827,.743,.586,.78];
+const PD={ninguno:[0,0,0,0,0,0],pasa_cabeza:[-6,-12,-10,-8,-6,-6],pegada_pecho:[-4,-8,-6,-4,-3,-4],mucha_sensi:[-10,-10,-10,-9,-7,-9],lenta:[8,8,8,6,4,6],pesada:[8,10,8,6,4,6],inestable:[-3,-6,-5,-4,-3,-3]};
+const ord=v=>{v=v.map(x=>cl(Math.round(+x||0),0,200));v[1]=Math.min(v[1],v[0]);v[2]=Math.min(v[2],v[1]);v[3]=Math.min(v[3],v[2]);v[4]=Math.min(v[4],v[3]);v[5]=Math.min(v[5],v[0]);return v};
+function calc(r,ov){
+  const B={baja:128,media:158,alta:184},G={baja:6,media:0,alta:-3},hzv=+r.hz||+DEV?.hz_pantalla||60;
+  const base=B[r.base]??158,gama=G[r.gama]??0,hz=hzv>=144?-6:hzv>=120?-4:hzv>=90?0:5,dd={2:4,3:0,4:-4}[+r.dedos]??0,es={corta:5,media:0,larga:-9}[r.estilo]??0,pd=PD[r.problema]||PD.ninguno;
+  const g0=base+gama+hz+dd+es;let v=ord([g0+pd[0],...RAT.map((k,i)=>g0*k+pd[i+1])]);
+  const n=+r.dpi_nativo||+DEV?.ppi,pl=+r.pulgadas||+DEV?.pantalla_pulgadas;let dpi=n>0?`${n} nativo · rango ${Math.round(n*.95/10)*10}–${Math.round(n*1.07/10)*10}`:(r.dpi||'Mantén el DPI nativo');
+  let s={2:62,3:55,4:48}[+r.dedos]??55;if(r.estilo==='corta')s+=3;if(r.estilo==='larga')s-=2;if(pl>=6.7)s-=3;else if(pl>0&&pl<6.2)s+=3;s=cl(s,35,80);let btn=`${s}% (rango ${s-5}–${s+5}%)`;
+  const known=[r.gama,r.hz,r.dpi_nativo,r.pulgadas,r.dedos,r.estilo,r.base,r.problema].filter(Boolean).length,sg=x=>(x>=0?'+':'')+x;
+  let why=[`Base ${r.base||'media'}: ${base}`,`Gama ${r.gama||'media'}: ${sg(gama)}`,`${hzv} Hz: ${sg(hz)}`,`${r.dedos||3} dedos: ${sg(dd)}`,`Estilo ${r.estilo||'media'}: ${sg(es)}`,`Problema (${r.problema||'ninguno'}): ${sg(pd[0])} general`];
+  if(ov){if(ov.v)v=ord(ov.v);if(ov.dpi)dpi=ov.dpi;if(ov.btn)btn=ov.btn;if(ov.why&&ov.why.length)why=ov.why}
+  return {v,dpi,btn,why,conf:Math.min(99,Math.round(55+known/8*38+(DEV?.web?6:0)+(ov?.v?4:0)))}}
+
+
+const RETRY=[408,429,500,502,503,504,520,521,522,523,524,525,526,529,530];
+
+const esc=t=>t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])),fmt=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+
+function friendly(e){const m=String(e&&e.message||e||''),st=e&&e.status;
+  if(/free tier|billing|paid tier/i.test(m))return 'Google dice que el plan gratis no está disponible para este modelo o función en tu cuenta. Ya probé con otros modelos; toca reintentar y, si sigue igual, revisa tu key en Google AI Studio.';
+  if(/quota|exhaust|rate limit|resource/i.test(m)||st===429)return 'Se alcanzó el límite de uso de la IA por ahora. Espera un minuto y toca reintentar.';
+  if(st>=500||st===408||/tard|high demand|overload|saturad|unavailable/i.test(m))return 'La IA está tardando o saturada ahora mismo. Tu mensaje no se perdió: toca reintentar.';
+  if(st===401||st===403||/api key|permission|forbidden/i.test(m))return 'La clave de la IA no tiene permiso o no es válida. Avisa al administrador del sitio.';
+  return (/[áéíóúñ¿¡]/i.test(m)||m.length<90)&&m?m:'No pude completar la solicitud. Toca reintentar.'}
+
+function fail(r,d){const e=new Error(d.error?.message||('HTTP '+r.status));e.status=r.status;throw e}
+
+function grab(t,from){const i=t.indexOf('{',from||0);if(i<0)return null;let d=0,s=false,q=0;for(let j=i;j<t.length;j++){const c=t[j];if(s){if(c==='\\')j++;else if(c==='"')s=false}else if(c==='"')s=true;else if(c==='{')d++;else if(c==='}'&&--d===0)return t.slice(i,j+1)}return null}
+
+/* Gemini: modelos vigentes (con caché), modelo más rápido primero, "thinking" controlado, timeouts y rotación si se satura */
+const gurl=p=>PROXY?PROXY+p:'https://generativelanguage.googleapis.com'+p+(p.includes('?')?'&':'?')+'key='+encodeURIComponent(cfg.k);
+async function tfetch(url,opt,ms){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{return await fetch(url,{...opt,signal:c.signal})}finally{clearTimeout(t)}}
+let MODELS=null;
+async function discover(){
+  if(MODELS)return MODELS;let all=null;
+  try{const c=JSON.parse(localStorage.getItem('optimex_models')||'null');if(c&&Date.now()-c.t<216e5&&c.all&&c.all.length)all=c.all}catch(e){}
+  if(!all){try{const r=await tfetch(gurl('/v1beta/models?pageSize=200'),{},15000),d=await r.json();if(!r.ok)throw 0;
+    all=(d.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''));try{localStorage.setItem('optimex_models',JSON.stringify({t:Date.now(),all}))}catch(e){}}catch(e){return {all:[],chat:[],fast:[],tts:[]}}}
+  const ver=n=>+((n.match(/gemini-(\d+(?:\.\d+)?)/)||[])[1]||0),pv=n=>+/preview|exp/.test(n),lt=n=>+/lite/.test(n),srt=(a,b)=>pv(a)-pv(b)||ver(b)-ver(a)||lt(a)-lt(b),
+    chat=all.filter(n=>/flash/.test(n)&&!/tts|image|live|audio|embed|thinking|robotics|computer|exp/.test(n)).sort(srt);
+  MODELS={all,chat,fast:[...chat].sort((a,b)=>lt(b)-lt(a)||srt(a,b)),tts:all.filter(n=>/tts/.test(n)).sort(srt)};return MODELS}
+const BAD={};
+let PAID={},WEBBLOCK=0;try{PAID=JSON.parse(localStorage.getItem('optimex_paid')||'{}');WEBBLOCK=+localStorage.getItem('optimex_wb')||0}catch(e){}
+const isPaid=m=>(PAID[m]||0)>Date.now(),PAYRE=/free tier|billing|paid tier|not available for this project/i;
+function markPaid(m){PAID[m]=Date.now()+432e5;try{localStorage.setItem('optimex_paid',JSON.stringify(PAID))}catch(e){}}
+function blockWeb(){WEBBLOCK=Date.now()+216e5;try{localStorage.setItem('optimex_wb',String(WEBBLOCK))}catch(e){}toast('La búsqueda web no está disponible en tu plan gratis; respondo sin ella.')}
+async function gemModels(kind){const M=await discover(),base=(kind==='fast'?M.fast:M.chat).slice(0,4);let ok='';try{ok=localStorage.getItem('optimex_ok_'+kind)||''}catch(e){}
+  const pref=!PROXY&&cfg.m&&cfg.m!==DEF.gemini&&M.all.includes(cfg.m)?[cfg.m]:[],l=[...new Set([...pref,...(ok&&(!M.all.length||M.all.includes(ok))?[ok]:[]),...base])];
+  const fr=l.filter(x=>!isPaid(x)),L2=fr.length?fr:l;L2.sort((a,b)=>((BAD[a]||0)>Date.now()?1:0)-((BAD[b]||0)>Date.now()?1:0));return L2.length?L2:['gemini-2.5-flash','gemini-3.5-flash']}
+const THINK={},TVC=[{thinkingBudget:0},{thinkingLevel:'minimal'},null],TVT=[{thinkingBudget:600},{thinkingLevel:'low'},null],TVD=[{thinkingBudget:1500},{thinkingLevel:'medium'},null];
+async function gem(body,kind){let last;const t0=Date.now(),think=kind==='think'||kind==='deep',tvs=kind==='deep'?TVD:kind==='think'?TVT:TVC,tmo=think?30000:20000,dl=think?75000:55000;
+  for(const m of await gemModels(kind)){for(let a=0;a<4;a++){
+    if(Date.now()-t0>dl)throw last||new Error('La IA tardó demasiado en responder');
+    const key=m+kind,tv=THINK[key]??0,b2={...body,generationConfig:{temperature:.8,maxOutputTokens:700,...(body.generationConfig||{})}};if(tvs[tv])b2.generationConfig.thinkingConfig=tvs[tv];
+    let r,d;try{r=await tfetch(gurl(`/v1beta/models/${m}:generateContent`),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b2)},tmo);d=await r.json().catch(()=>({}))}
+    catch(e){const ab=e.name==='AbortError';last=new Error(ab?'La IA tardó demasiado en responder':'Sin conexión con el servidor');last.status=ab?408:0;BAD[m]=Date.now()+45000;break}
+    if(r.ok){LAT=Date.now()-t0;curModel=m;try{localStorage.setItem('optimex_ok_'+kind,m)}catch(e){}tele();return d}
+    const e=new Error(d.error?.message||('HTTP '+r.status));e.status=r.status;last=e;
+    if(PAYRE.test(e.message)){if(body.tools){body={...body};delete body.tools;blockWeb();a--;continue}markPaid(m);break}
+    if(r.status===401||r.status===403||/api key|permission/i.test(e.message))throw e;
+    if(r.status===400&&tv<2){THINK[key]=tv+1;a--;continue}
+    if(r.status===404||r.status===400)break;
+    if(r.status===429||r.status===503){BAD[m]=Date.now()+45000;await sleep(700*(a+1));if(a>=1)break;continue}
+    if(RETRY.includes(r.status)){BAD[m]=Date.now()+45000;break}
+    throw e}}
+  throw last}
+
+async function callAI(sys=SYS,M=msgs()){
+  const p=P(),{m,k}=cfg;if(!HK())throw new Error('El servicio no está configurado todavía.');let r,d;
+  if(p==='anthropic'){r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:m,max_tokens:1200,system:sys,messages:M})});d=await r.json();if(!r.ok)fail(r,d);return d.content.map(c=>c.text||'').join('')}
+  if(p==='openai'){r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+k},body:JSON.stringify({model:m,messages:[{role:'system',content:sys},...M]})});d=await r.json();if(!r.ok)fail(r,d);return d.choices[0].message.content}
+  d=await gem({systemInstruction:{parts:[{text:sys}]},contents:M.map(h=>({role:h.role==='user'?'user':'model',parts:[{text:h.content}]})),generationConfig:{maxOutputTokens:600}},'fast');return d.candidates[0].content.parts.map(x=>x.text||'').join('')}
+
+function devHTML(D){const R=[['Modelo',D.modelo],['Chipset',D.chipset],['Pantalla',[D.pantalla_pulgadas&&D.pantalla_pulgadas+'"',D.resolucion].filter(Boolean).join(' · ')],['Refresco',D.hz_pantalla&&D.hz_pantalla+' Hz'],['Táctil',D.muestreo_tactil_hz&&D.muestreo_tactil_hz+' Hz'],['Densidad',D.ppi&&D.ppi+' ppi'],['Panel',D.panel],['RAM',D.ram_gb&&D.ram_gb+' GB']].filter(x=>x[1]);
+  return '<div class="ct">FICHA TÉCNICA<span class="tag '+(D.web?'ok':'es')+'">'+(D.web?'VERIFICADO EN LA WEB':'ESTIMADO')+'</span></div><div class="kv">'+R.map(x=>'<span>'+x[0]+'</span><b>'+esc(String(x[1]))+'</b>').join('')+'</div>'}
+async function scanDevice(name,slot){
+  if(!name||name.toLowerCase()===devName)return;devName=name.toLowerCase();DEV=null;
+  const card=document.createElement('div');card.className='card';card.innerHTML='<div class="ct">ESCANEANDO DISPOSITIVO<span class="bk">_</span></div><div>Buscando especificaciones de '+esc(name)+'…</div><div class="pg"><i></i></div>';(slot||LG()).appendChild(card);
+  try{
+    const d=await gem({...(Date.now()>WEBBLOCK?{tools:[{google_search:{}}]}:{}),contents:[{role:'user',parts:[{text:`Busca en internet las especificaciones técnicas reales del celular "${name}". Responde SOLO un JSON, sin texto extra, con estas claves: {"modelo":"","chipset":"","pantalla_pulgadas":0,"resolucion":"","hz_pantalla":0,"muestreo_tactil_hz":0,"ppi":0,"panel":"","ram_gb":0,"gama":"baja|media|alta"}. Usa null en lo que no encuentres.`}]}],generationConfig:{maxOutputTokens:500,temperature:0}},'smart');
+    const cand=d.candidates?.[0],txt=(cand?.content?.parts||[]).map(p=>p.text||'').join(''),j=grab(txt),gm=cand?.groundingMetadata;
+    if(!j)throw new Error('sin datos');DEV={...JSON.parse(j),web:!!(gm&&((gm.webSearchQueries||[]).length||(gm.groundingChunks||[]).length))};
+    card.innerHTML=devHTML(DEV);
+    
+  }catch(e){card.innerHTML='<div class="ct">DISPOSITIVO</div><div>No pude verificar las especificaciones; uso estimaciones.</div>';setTimeout(()=>card.remove(),4000)}
+  down()}
+
+async function calibrate(r){
+  if(scanP)await Promise.race([scanP,sleep(12000)]);
+  const hz=+DEV?.hz_pantalla||+r.hz,tc=+DEV?.muestreo_tactil_hz||+r.muestreo_tactil,pp=+DEV?.ppi||+r.dpi_nativo;
+  const bits=[hz&&hz+' Hz',tc&&'táctil '+tc+' Hz',pp&&pp+' ppi',r.dedos&&r.dedos+' dedos',r.estilo,r.problema].filter(Boolean).join(' · '),card=document.createElement('div');
+  card.className='card';card.innerHTML='<div class="ct">CALIBRANDO<span class="bk">_</span></div><div>'+esc(bits)+'</div><div class="pg"><i></i></div>';LG().appendChild(card);down();
+  try{
+    const d=await gem({systemInstruction:{parts:[{text:CAL_SYS}]},contents:[{role:'user',parts:[{text:JSON.stringify({perfil:r,dispositivo:DEV})}]}],generationConfig:{maxOutputTokens:1500,temperature:.35}},'think');
+    const o=JSON.parse(grab((d.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('')));
+    const v=K.map(k=>+o[k]);if(v.some(x=>!(x>=0&&x<=200)))throw new Error('valores inválidos');
+    card.remove();const s=Math.round(+o.boton_pct);
+    return {v,dpi:o.dpi_recomendado||null,btn:s>=30&&s<=90?`${s}% (rango ${s-5}–${s+5}%)`:null,why:(Array.isArray(o.razon)?o.razon:[]).slice(0,4).map(String)}
+  }catch(e){card.remove();toast('Modo experto no disponible ahora, uso el motor local.');return null}}
+
+function cnt(el,to,ms=1300){const t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/ms);el.textContent=Math.round(to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)})(t0)}
+const NAMES=['General','Punto rojo','Mira 2x','Mira 4x','Mira AWM','Cámara libre'];
+function hud(r,save,ov,prev){
+  const c=calc(r,ov),nick=r.apodo||'Jugador',box=document.createElement('div');box.className='hud';
+  box.innerHTML=`<div class="hh"><div class="k">SENSI DE</div><h2></h2><div class="sub"></div><div class="cf">DATOS<b>${c.conf}%</b></div></div>`+
+   NAMES.map((n,i)=>`<div class="row ${i?'':'big'}" style="--d:${i*.1}s"><div><span>${n}${prev?dl(c.v[i]-prev[i]):''}</span><b>0</b></div><div class="bar"><i data-w="${c.v[i]/2}"></i></div></div>`).join('')+
+   `<div class="sys"><h3>AJUSTES <span class="nn"></span></h3><div class="st"><span>DPI</span><b>${esc(String(c.dpi))}</b></div><div class="st"><span>Tamaño del botón de disparo</span><b>${esc(c.btn)}</b></div></div>
+   <details><summary>▸ CÓMO SE CALCULÓ</summary><p>${c.why.map(esc).join('<br>')}</p></details>
+   <div class="acts"><button id="cp">COPIAR</button><button id="nw">NUEVA CALIBRACIÓN</button></div>`;
+  box.querySelector('h2').textContent=nick;box.querySelector('.sub').textContent=r.perfil||'';box.querySelector('.nn').textContent=nick.toUpperCase();
+  LG().appendChild(box);down();
+  setTimeout(()=>{box.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%');box.querySelectorAll('.row b').forEach((b,i)=>setTimeout(()=>cnt(b,c.v[i]),i*100))},80);
+  const txt=`SENSI DE ${nick} | Optimex IA | Dev: lasquer47\n${r.perfil||''}\n`+NAMES.map((n,i)=>`${n}: ${c.v[i]}`).join('\n')+`\nDPI: ${c.dpi}\nBotón de disparo: ${c.btn}`;
+  box.querySelector('#cp').onclick=async e=>{try{await navigator.clipboard.writeText(txt);e.target.textContent='¡COPIADO!'}catch(_){prompt('Copia:',txt)}};
+  box.querySelector('#nw').onclick=newCal;
+  if(save){try{const h=JSON.parse(localStorage.getItem('optimex_h')||'[]');h.unshift({t:Date.now(),r,g:c.v[0],ov:{v:c.v,dpi:c.dpi,btn:c.btn,why:c.why}});localStorage.setItem('optimex_h',JSON.stringify(h.slice(0,20)))}catch(e){}}
+}
+function showHist(){
+  let h=[];try{h=JSON.parse(localStorage.getItem('optimex_h')||'[]')}catch(e){}
+  const l=$('#hl');l.innerHTML=h.length?'':'<div class="n">Aún no hay sensis guardadas. Se guardan solas al generarlas.</div>';
+  h.forEach(x=>{const b=document.createElement('button');b.className='hi';b.innerHTML='<b></b><small></small>';b.firstChild.textContent=(x.r.apodo||'Jugador')+' · General '+x.g;b.lastChild.textContent=(x.r.perfil||'')+' · '+new Date(x.t).toLocaleDateString();b.onclick=()=>{$('#his').classList.remove('on');hud(x.r,false,x.ov)};l.appendChild(b)});
+  $('#his').classList.add('on')}
+
+
+
+/* ===== ESFERA 3D OPTIMIZADA (partículas + red de nodos + pulsos de luz) ===== */
+const cv=$('#orb'),cx=cv.getContext('2d');
+const LOW=(navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=3,RED=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const NP=LOW?1000:1700,NN=LOW?150:220;
+const PX=new Float32Array(NP),PY=new Float32Array(NP),PZ=new Float32Array(NP),PH=new Float32Array(NP),SX=new Float32Array(NP),SY=new Float32Array(NP),SZ=new Float32Array(NP);
+const NX=new Float32Array(NN),NY=new Float32Array(NN),NZ=new Float32Array(NN),NSX=new Float32Array(NN),NSY=new Float32Array(NN),NSZ=new Float32Array(NN),EA=[],EB=[];
+(()=>{
+  const idx=[...Array(NP).keys()];for(let i=NP-1;i>0;i--){const j=Math.random()*(i+1)|0;[idx[i],idx[j]]=[idx[j],idx[i]]}
+  for(let k=0;k<NP;k++){const i=idx[k],y=1-2*(i+.5)/NP,r=Math.sqrt(1-y*y),a=i*2.399963;PX[k]=Math.cos(a)*r;PY[k]=y;PZ[k]=Math.sin(a)*r;PH[k]=Math.random()*6.283}
+  for(let i=0;i<NN;i++){const y=1-2*(i+.5)/NN,r=Math.sqrt(1-y*y),a=i*2.399963;NX[i]=Math.cos(a)*r;NY[i]=y;NZ[i]=Math.sin(a)*r}
+  const seen=new Set();
+  for(let i=0;i<NN;i++){const d=[];for(let j=0;j<NN;j++)if(j!==i){const dx=NX[i]-NX[j],dy=NY[i]-NY[j],dz=NZ[i]-NZ[j];d.push([dx*dx+dy*dy+dz*dz,j])}
+    d.sort((a,b)=>a[0]-b[0]);for(let k=0;k<3;k++){const j=d[k][1],key=i<j?i*NN+j:j*NN+i;if(!seen.has(key)){seen.add(key);EA.push(i);EB.push(j)}}}
+})();
+const NE=EA.length,PU=Array.from({length:16},()=>({e:Math.random()*NE|0,t:Math.random(),s:.0004+Math.random()*.0004}));
+const ID={s:.00022,r:1,c:[70,224,216],n:3,a:.016,k:1},TH={s:.0016,r:.88,c:[255,176,0],n:14,a:.055,k:2.4};
+const cur={s:ID.s,r:1,a:ID.a},col=[70,224,216],PC=[.95,.65,.35];
+const BK=[[-2,-.25,.35,.18,1.1],[-.25,.35,2,.5,1.6],[.35,2,2,.95,2.2]];
+let W=0,H=0,DPR=1,cx0=0,cy0=0,R=100,needSize=true,A0=Math.random()*6,yawV=0,pdy=0,burst=0,lastT=0,fAvg=16,fN=0,np=NP;
+function size(){DPR=Math.min(devicePixelRatio||1,LOW?1.25:1.75);W=innerWidth;H=innerHeight;cv.width=W*DPR|0;cv.height=H*DPR|0;cx.setTransform(DPR,0,0,DPR,0,0);
+  const tall=H>W;cx0=W/2;cy0=tall?H*.28:H*.44;R=tall?Math.min(W*.38,H*.19):H*.34;needSize=false}
+addEventListener('resize',()=>{if(Math.abs(innerWidth-W)>2||Math.abs(innerHeight-H)>150)needSize=true});
+function frame(t){
+  requestAnimationFrame(frame);
+  if(document.hidden){lastT=0;return}
+  if(needSize)size();
+  const dt=lastT?Math.min(100,t-lastT):16;lastT=t;
+  fAvg+=(dt-fAvg)*.06;if(++fN%60===0&&fAvg>27&&np>420)np=Math.max(420,np*.8|0);
+  const T=mode==='think'?TH:ID,k1=Math.min(1,dt*.004);
+  cur.s+=(T.s-cur.s)*k1;cur.r+=(T.r-cur.r)*k1;cur.a+=(T.a-cur.a)*k1;for(let i=0;i<3;i++)col[i]+=(T.c[i]-col[i])*k1;
+  const c=`${col[0]|0},${col[1]|0},${col[2]|0}`;
+  yawV*=.94;pdy*=.985;A0+=(RED?cur.s*.3:cur.s)*dt+yawV;
+  const tl=.4+.08*Math.sin(t/4300)+pdy,ca=Math.cos(A0),sa=Math.sin(A0),ct=Math.cos(tl),st=Math.sin(tl),S=R*cur.r*(1+burst*.06),amp=cur.a+burst*.07,tm=t*.0012;
+  cx.clearRect(0,0,W,H);
+  const g=cx.createRadialGradient(cx0,cy0,S*.15,cx0,cy0,S*1.8);g.addColorStop(0,`rgba(${c},${.13+burst*.12})`);g.addColorStop(1,`rgba(${c},0)`);cx.fillStyle=g;cx.fillRect(0,0,W,cy0+S*1.9);
+  for(let i=0;i<np;i++){const rr=1+amp*Math.sin(tm+PH[i]),x=PX[i]*rr,y=PY[i]*rr,z=PZ[i]*rr,x1=x*ca+z*sa,z1=z*ca-x*sa,y2=y*ct-z1*st,z2=y*st+z1*ct,f=S*(1+z2*.1);SX[i]=cx0+x1*f;SY[i]=cy0+y2*f;SZ[i]=z2}
+  for(let b=0;b<3;b++){const lo=[-2,-.25,.35][b],hi=[-.25,.35,2][b],sz=BK[b][4];cx.fillStyle=`rgba(${c},${BK[b][3]})`;
+    for(let i=0;i<np;i++){const z=SZ[i];if(z>=lo&&z<hi)cx.fillRect(SX[i]-sz/2,SY[i]-sz/2,sz,sz)}}
+  for(let i=0;i<NN;i++){const x=NX[i],y=NY[i],z=NZ[i],x1=x*ca+z*sa,z1=z*ca-x*sa,y2=y*ct-z1*st,z2=y*st+z1*ct,f=S*1.02*(1+z2*.1);NSX[i]=cx0+x1*f;NSY[i]=cy0+y2*f;NSZ[i]=z2}
+  cx.beginPath();for(let e=0;e<NE;e++){const a=EA[e],b=EB[e];if(NSZ[a]>-.05&&NSZ[b]>-.05){cx.moveTo(NSX[a],NSY[a]);cx.lineTo(NSX[b],NSY[b])}}
+  cx.strokeStyle=`rgba(${c},${(.2+cur.a*2).toFixed(3)})`;cx.lineWidth=.7;cx.stroke();
+  cx.fillStyle='rgba(255,255,255,.85)';for(let i=0;i<NN;i++)if(NSZ[i]>0)cx.fillRect(NSX[i]-1.2,NSY[i]-1.2,2.4,2.4);
+  for(let i=0;i<T.n;i++){const p=PU[i];p.t+=p.s*dt*T.k;if(p.t>1){p.t=0;p.e=Math.random()*NE|0}
+    const a=EA[p.e],b=EB[p.e];if(NSZ[a]<-.05||NSZ[b]<-.05)continue;
+    for(let q=0;q<3;q++){const u=p.t-q*.07;if(u<0)break;const x=NSX[a]+(NSX[b]-NSX[a])*u,y=NSY[a]+(NSY[b]-NSY[a])*u,s=3-q*.7;cx.fillStyle=`rgba(255,176,0,${PC[q]})`;cx.fillRect(x-s/2,y-s/2,s,s)}}
+  if(burst>0){const r0=S*(1.02+(1-burst)*.55);cx.lineWidth=1.5;cx.beginPath();cx.arc(cx0,cy0,r0,0,6.283);cx.strokeStyle=`rgba(61,220,151,${(burst*.6).toFixed(3)})`;cx.stroke();
+    cx.beginPath();cx.arc(cx0,cy0,r0*.93,0,6.283);cx.strokeStyle=`rgba(255,176,0,${(burst*.35).toFixed(3)})`;cx.stroke();burst=Math.max(0,burst-dt*.0011)}
+}
+{let drag=false,lx=0,ly=0;
+  addEventListener('pointerdown',e=>{if(e.target.closest('textarea,input,button,select,.card,.hud,.modal'))return;drag=true;lx=e.clientX;ly=e.clientY});
+  addEventListener('pointermove',e=>{if(!drag)return;yawV=cl(yawV+(e.clientX-lx)*.0006,-.06,.06);pdy=cl(pdy+(e.clientY-ly)*.002,-.5,.5);lx=e.clientX;ly=e.clientY});
+  addEventListener('pointerup',()=>drag=false);addEventListener('pointercancel',()=>drag=false);
+  addEventListener('scroll',()=>{cv.style.opacity=1-Math.min(scrollY/800,.5)},{passive:true})}
+function setMode(m){mode=m;document.body.dataset.mode=m;$('#st').textContent=m==='think'?'PROCESANDO':'EN LÍNEA'}
+
+/* ===== IA ===== */
+async function ai(sys,text){
+  try{return await callAI(sys,[{role:'user',content:text}])}
+  catch(e){if(e instanceof TypeError&&!/fetch|network/i.test(e.message))throw new Error('La IA no devolvió respuesta. Toca reintentar.');throw e}}
+
+/* ===== PERFIL, ANÁLISIS Y CALIBRACIÓN ===== */
+const OPT={estilo:[['corta','Corta'],['media','Media'],['larga','Larga']],dedos:[[2,'2 dedos'],[3,'3 dedos'],[4,'4 dedos']],base:[['baja','Baja'],['media','Media'],['alta','Alta']],
+  problema:[['ninguno','Ninguno'],['pasa_cabeza','Pasa la cabeza'],['pegada_pecho','Cae al pecho'],['mucha_sensi','Mucha sensi'],['lenta','Lenta'],['pesada','Pesada'],['inestable','Inestable']]};
+const LBL={estilo:'DISTANCIA DE PELEA',dedos:'DEDOS',base:'SENSIBILIDAD BASE',problema:'PROBLEMA AL DISPARAR'};
+const EX=['Redmi Note 12, 3 dedos, pelea corta, se me pasa la cabeza','Samsung A54, 2 dedos, media distancia, siento la mira lenta','iPhone 13, 4 dedos, larga distancia, sensibilidad alta'];
+const EXA=['Sube un poco la 4x','Se me pasa la cabeza','Todo se siente muy rápido','La AWM va lenta'];
+const PH0='Describe tu celular y cómo juegas: modelo, dedos, distancia, problema…',PHA='Afina con tus palabras: "la 4x va lenta", "se me pasa la cabeza"…';
+function card(title,text){const d=document.createElement('div');d.className='card';d.innerHTML='<div class="ct">'+esc(title)+'<span class="bk">_</span></div><div></div><div class="pg"><i></i></div>';d.children[1].textContent=text;LG().appendChild(d);down();return d}
+function note(title,text,cls){const d=document.createElement('div');d.className='card '+(cls||'nt2');d.innerHTML='<div class="ct"></div><div></div>';d.children[0].textContent=title;d.children[1].textContent=text;LG().appendChild(d);down();return d}
+function errCard(e,fn){const d=document.createElement('div');d.className='card err';d.innerHTML='<div class="ct">AVISO</div><div class="er"></div><div class="rwb"><button type="button">⟳ REINTENTAR</button><button type="button">DETALLE</button></div><div class="dt"></div>';
+  d.querySelector('.er').textContent=friendly(e);d.querySelector('.dt').textContent=String(e&&e.message||e).slice(0,400);
+  const b=d.querySelectorAll('button');b.onclick=null;b[0].onclick=()=>{d.remove();fn()};b[1].onclick=()=>d.classList.toggle('open');LG().appendChild(d);down()}
+function renderExs(){const x=$('#exs');x.innerHTML='';(LASTCAL&&!AWAIT?EXA:AWAIT?[]:EX).forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>{const i=$('#in');i.value=t;autosize();i.focus()};x.appendChild(b)})}
+function btnState(){const b=$('#gob');b.disabled=busy;b.textContent=busy?'PROCESANDO…':AWAIT?'ENVIAR RESPUESTA':LASTCAL?'⟳ AJUSTAR':'◉ ANALIZAR';$('#in').placeholder=LASTCAL&&!AWAIT?PHA:PH0;renderExs()}
+function autosize(){const t=$('#in');t.style.height='auto';t.style.height=Math.min(180,Math.max(74,t.scrollHeight))+'px'}
+const optLbl=(k,v)=>(OPT[k].find(o=>String(o[0])===String(v))||[0,v])[1];
+
+async function analyze(v){
+  busy=true;setMode('think');btnState();
+  if(!AWAIT){LG().innerHTML='';CTX=[];ASKED=false}
+  document.querySelectorAll('#out .q').forEach(x=>x.remove());
+  CTX.push(v);const sc=card('ANALIZANDO PERFIL','Interpretando tu descripción…');
+  try{
+    const out=await ai(PARSE_SYS,CTX.join('\n')),j=grab(out);if(!j)throw new Error('No pude interpretar la descripción. Intenta de nuevo con un poco más de detalle.');
+    const p=JSON.parse(j);sc.remove();
+    if(!(p.celular||'').trim()&&(p.pregunta||'').trim()&&!ASKED){
+      ASKED=true;AWAIT=true;note('FALTA UN DATO',p.pregunta.trim(),'q');$('#in').focus();
+    }else{AWAIT=false;showProfile(p)}
+  }catch(e){sc.remove();CTX.pop();errCard(e,()=>analyze(v))}
+  finally{busy=false;setMode('idle');btnState()}}
+
+function showProfile(p){
+  const ok=(k,v)=>OPT[k].some(o=>String(o[0])===String(v)),DF={estilo:'media',dedos:3,base:'media',problema:'ninguno'};
+  PROF={celular:String(p.celular||'').trim(),apodo:String(p.apodo||'').trim(),hz:+p.hz||0,notas:String(p.notas||''),auto:{}};
+  for(const k in DF){if(ok(k,p[k]))PROF[k]=k==='dedos'?+p[k]:p[k];else{PROF[k]=DF[k];PROF.auto[k]=1}}
+  const el=document.createElement('div');el.className='card pf';
+  el.innerHTML='<div class="ct">PERFIL DETECTADO</div><input class="ph" placeholder="Tu celular (marca y modelo)" autocomplete="off"><div class="nt"></div>'+
+    Object.keys(OPT).map(k=>'<div class="rw" data-k="'+k+'"><div class="lb">'+LBL[k]+'<span class="au"'+(PROF.auto[k]?'':' hidden')+'>AUTO</span></div><div class="opts">'+
+      OPT[k].map(o=>'<button type="button" class="opt'+(String(o[0])===String(PROF[k])?' on':'')+'" data-v="'+o[0]+'">'+o[1]+'</button>').join('')+'</div></div>').join('')+
+    '<div class="dv"></div><button type="button" class="gen">⚡ GENERAR SENSI</button>';
+  const ph=el.querySelector('.ph');ph.value=PROF.celular;ph.oninput=()=>{PROF.celular=ph.value.trim()};el.querySelector('.nt').textContent=PROF.notas;
+  el.onclick=e=>{const o=e.target.closest('.opt');
+    if(o){const rw=o.closest('.rw'),k=rw.dataset.k,v=o.dataset.v;PROF[k]=k==='dedos'?+v:v;delete PROF.auto[k];rw.querySelectorAll('.opt').forEach(b=>b.classList.toggle('on',b===o));rw.querySelector('.au').hidden=true;return}
+    if(e.target.closest('.gen'))generate(el)};
+  LG().appendChild(el);down();
+  if(PROF.celular)scanP=scanDevice(PROF.celular,el.querySelector('.dv'));else{DEV=null;devName='';scanP=null}}
+
+async function generate(el){
+  if(busy)return;busy=true;setMode('think');btnState();const gb=el.querySelector('.gen');gb.disabled=true;gb.textContent='CALIBRANDO…';
+  document.querySelectorAll('#out .hud,#out .nt2').forEach(x=>x.remove());
+  try{
+    const nm=PROF.celular.toLowerCase();if(nm&&nm!==devName)scanP=scanDevice(PROF.celular,el.querySelector('.dv'));else if(!nm){DEV=null;devName='';scanP=null}
+    if(scanP)await Promise.race([scanP,sleep(12000)]);
+    const nick=PROF.apodo||PROF.celular||'Jugador',pf=[PROF.dedos+' dedos',optLbl('estilo',PROF.estilo).toLowerCase(),PROF.problema==='ninguno'?'sin problemas':optLbl('problema',PROF.problema).toLowerCase()];
+    if(PROF.apodo&&PROF.celular)pf.push(PROF.celular);
+    const r={apodo:nick,perfil:pf.join(' · '),gama:DEV?.gama||'media',hz:PROF.hz||0,dpi_nativo:0,pulgadas:0,muestreo_tactil:0,dedos:PROF.dedos,estilo:PROF.estilo,base:PROF.base,problema:PROF.problema};
+    const ov=await calibrate(r),c=calc(r,ov);LASTCAL={r,v:c.v,dpi:c.dpi,btn:c.btn,why:c.why};
+    hud(r,true,LASTCAL);burst=1;$('#out').lastElementChild.scrollIntoView({behavior:'smooth',block:'start'});gb.textContent='⟳ RECALIBRAR';
+  }catch(e){gb.textContent='⚡ GENERAR SENSI';errCard(e,()=>generate(el))}
+  finally{busy=false;gb.disabled=false;setMode('idle');btnState();tele()}}
+
+async function adjust(v){
+  busy=true;setMode('think');btnState();const sc=card('AJUSTANDO','Aplicando tu cambio…');
+  try{
+    const cur0=Object.fromEntries(K.map((k,i)=>[k,LASTCAL.v[i]])),out=await ai(ADJ_SYS,JSON.stringify({peticion:v,valores:cur0})),j=grab(out);if(!j)throw new Error('No pude interpretar el ajuste. Intenta con otras palabras.');
+    const o=JSON.parse(j),aj=o.ajustes||{};sc.remove();
+    if(!K.some(k=>+aj[k])){note('AJUSTE',o.mensaje||'No identifiqué qué ajustar. Prueba: "sube un poco la 4x" o "se me pasa la cabeza".');return}
+    const prev=LASTCAL.v.slice(),nv=ord(LASTCAL.v.map((x,i)=>x+cl(+aj[K[i]]||0,-15,15)));LASTCAL={...LASTCAL,v:nv};
+    document.querySelectorAll('#out .hud,#out .nt2').forEach(x=>x.remove());
+    if(o.mensaje)note('AJUSTE APLICADO',String(o.mensaje));hud(LASTCAL.r,true,LASTCAL,prev);burst=1;$('#out').lastElementChild.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){sc.remove();errCard(e,()=>adjust(v))}
+  finally{busy=false;setMode('idle');btnState();tele()}}
+
+function newCal(){LG().innerHTML='';LASTCAL=null;CTX=[];PROF=null;AWAIT=false;ASKED=false;DEV=null;devName='';scanP=null;btnState();scrollTo({top:0,behavior:'smooth'});$('#in').focus()}
+
+/* ===== EVENTOS ===== */
+$('#f').onsubmit=e=>{e.preventDefault();const v=$('#in').value.trim();if(!v||busy)return;$('#in').value='';autosize();(LASTCAL&&!AWAIT)?adjust(v):analyze(v)};
+$('#in').oninput=autosize;
+$('#in').onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('#f').requestSubmit()}};
+$('#hb').onclick=showHist;$('#hclose').onclick=()=>$('#his').classList.remove('on');
+$('#hclear').onclick=()=>{try{localStorage.removeItem('optimex_h')}catch(e){}showHist();tele()};
+$('#cb').onclick=()=>{$('#prov').value=cfg.p;$('#model').value=cfg.m;$('#key').value=cfg.k;$('#cfg').classList.add('on')};
+$('#close').onclick=()=>$('#cfg').classList.remove('on');
+$('#prov').onchange=()=>$('#model').value=DEF[$('#prov').value];
+$('#save').onclick=()=>{cfg={p:$('#prov').value,m:$('#model').value.trim()||DEF[$('#prov').value],k:$('#key').value.trim()};try{localStorage.setItem('optimex',JSON.stringify(cfg))}catch(e){}if(PROXY){cfg.p='gemini';cfg.k=''}$('#cfg').classList.remove('on')};
+
+const ICO={
+hist:'<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-7 3.4"/><path d="M3 4v4h4M12 7v5l3 2"/></svg>',
+gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>'};
+(async()=>{
+  $('#hb').innerHTML=ICO.hist;$('#cb').innerHTML=ICO.gear;if(PROXY)$('#cb').style.display='none';
+  requestAnimationFrame(frame);btnState();tele();
+  const b=$('#bt'),pb=$('#pbi'),L=['kernel optimex v10.0','esfera neuronal 3D','motor de calibración experto','búsqueda de dispositivos','enlace seguro (proxy)'];
+  for(let i=0;i<L.length;i++){b.innerHTML+='[ <u>OK</u> ] '+L[i]+'\n';pb.style.width=((i+1)/L.length*100)+'%';await sleep(240)}
+  b.innerHTML+='> sistema en línea<span class="bk">_</span>';await sleep(380);
+  $('#boot').style.opacity=0;setTimeout(()=>$('#boot').remove(),700);
+  if(!PROXY&&!cfg.k)$('#cb').click();else if(HK())discover();
+})();
+
+</script>
+</body>
+</html>
